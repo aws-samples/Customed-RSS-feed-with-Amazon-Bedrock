@@ -1,8 +1,8 @@
-# AWSNews: Intelligent AWS News Distribution with Amazon Bedrock Prompt Flow
+# Customed-RSS-feed-with-Amazon-Bedrock(AWSNews): Intelligent AWS News Distribution with Amazon Bedrock Prompt Flow
 
 ## Overview
 
-AWSNews leverages Amazon Bedrock prompt flow to automate the process of filtering and distributing relevant AWS news to customer technical teams, ensuring only the most pertinent updates reach the right audience.
+Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) leverages Amazon Bedrock prompt flow to automate the process of filtering and distributing relevant AWS news to customer technical teams, ensuring only the most pertinent updates reach the right audience.
 
 ## Solution Architecture
 
@@ -74,6 +74,6 @@ Continuous Improvement: Learns from ongoing data to improve relevance filtering.
 AWS Service Integration: Easily extends to integrate with other AWS services.
 
 ## Conclusion
-AWSNews demonstrates Amazon Bedrock's prompt flow capability to intelligently filter and distribute relevant AWS news. By ensuring customers receive actionable information, AWSNews empowers technical teams with timely, curated insights.
+Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) demonstrates Amazon Bedrock's prompt flow capability to intelligently filter and distribute relevant AWS news. By ensuring customers receive actionable information, AWSNews empowers technical teams with timely, curated insights.
 
 We welcome feedback and encourage you to share innovative uses of this solution in real-world scenarios.
