@@ -1,0 +1,4 @@
+feedparser
+rfeed
+pytz
+

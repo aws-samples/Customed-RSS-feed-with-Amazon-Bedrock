@@ -1,0 +1,269 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CloudFront with S3 and Lambda function to update XML files every 30 minutes
+Resources:
+  FeedUrlSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-feed-url-secret
+      Description: Secret for storing the FEED_URL
+      SecretString:
+        Fn::Sub: '{"FEED_URL": "https://aws.amazon.com/about-aws/whats-new/recent/feed/"}'
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: awsnews-${AWS::StackName}-${AWS::AccountId}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName:
+          Ref: LoggingBucket
+        LogFilePrefix: s3-access-logs/
+      LifecycleConfiguration:
+        Rules:
+        - Id: DeleteOldVersions
+          Status: Enabled
+          NoncurrentVersionExpirationInDays: 90
+        - Id: DeleteOldLogs
+          Status: Enabled
+          Prefix: s3-access-logs/
+          ExpirationInDays: 90
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: true
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
+      LifecycleConfiguration:
+        Rules:
+        - Id: DeleteOldLogs
+          Status: Enabled
+          ExpirationInDays: 90
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment:
+          Ref: S3Bucket
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultRootObject: awsnews.xml
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+        HttpVersion: http2
+        Origins:
+        - DomainName:
+            Fn::GetAtt:
+            - S3Bucket
+            - RegionalDomainName
+          Id: S3Origin
+          S3OriginConfig:
+            OriginAccessIdentity:
+              Fn::Sub: origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
+        PriceClass: PriceClass_100
+        Logging:
+          Bucket:
+            Fn::GetAtt:
+            - LoggingBucket
+            - RegionalDomainName
+          Prefix: cloudfront-logs/
+          IncludeCookies: false
+  FeedparserLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: feedparser-layer
+      Description: Layer for feedparser library
+      ContentUri: ../../feedparser-layer.zip
+      CompatibleRuntimes:
+      - python3.12
+      RetentionPolicy: Retain
+  FlowExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: bedrock.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: BedrockFlowExecutionPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - bedrock:InvokeModel
+            - s3:GetObject
+            - s3:PutObject
+            Resource: '*'
+  UpdateXMLFilesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: UpdateXMLFilesFunction
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Timeout: 300
+      Layers:
+      - Ref: FeedparserLayer
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: S3Bucket
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - secretsmanager:GetSecretValue
+          - secretsmanager:DescribeSecret
+          Resource:
+            Ref: FeedUrlSecret
+        - Effect: Allow
+          Action:
+          - bedrock:InvokeModel
+          - bedrock:CreateFlow
+          - bedrock:UpdateFlow
+          - bedrock:DeleteFlow
+          - bedrock:ListFlows
+          - bedrock:ListFlowAliases
+          - bedrock:DeleteFlow
+          - bedrock:DeleteFlowAlias
+          - bedrock:DeleteFlowVersion
+          - bedrock:GetFlow
+          - bedrock:PrepareFlow
+          - bedrock:CreateFlowVersion
+          - bedrock:CreateFlowAlias
+          - bedrock:InvokeFlow
+          - bedrock-agent-runtime:InvokeAgent
+          - bedrock-agent-runtime:InvokeAgentAlias
+          - bedrock-agent-runtime:InvokeFlow
+          - bedrock-agent-runtime:RetrieveAgent
+          - bedrock-agent-runtime:ListAgents
+          - bedrock-agent-runtime:ListAgentAliases
+          - bedrock-agent-runtime:ListAgentVersions
+          - bedrock-agent-runtime:GetAgent
+          - bedrock-agent-runtime:GetAgentAlias
+          - bedrock-agent-runtime:GetAgentVersion
+          - bedrock-agent-runtime:CreateFlow
+          - bedrock-agent-runtime:UpdateFlow
+          - bedrock-agent-runtime:DeleteFlow
+          - bedrock-agent-runtime:CreateFlowAlias
+          - bedrock-agent-runtime:UpdateFlowAlias
+          - bedrock-agent-runtime:DeleteFlowAlias
+          - bedrock-agent-runtime:ListFlows
+          - bedrock-agent-runtime:ListFlowAliases
+          - bedrock-agent-runtime:GetFlow
+          - bedrock-agent-runtime:GetFlowAlias
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - iam:PassRole
+          Resource:
+            Fn::GetAtt:
+            - FlowExecutionRole
+            - Arn
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: S3Bucket
+          FLOW_EXECUTION_ROLE_ARN:
+            Fn::GetAtt:
+            - FlowExecutionRole
+            - Arn
+          FEED_URL_SECRET_NAME:
+            Ref: FeedUrlSecret
+      Events:
+        ScheduledExecution:
+          Type: Schedule
+          Properties:
+            Schedule: rate(30 minutes)
+    Metadata:
+      SamResourceId: UpdateXMLFilesFunction
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: S3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity
+                ${CloudFrontOriginAccessIdentity}
+          Action: s3:GetObject
+          Resource:
+            Fn::Sub: ${S3Bucket.Arn}/*
+  CopyXMLFilesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CopyXMLFilesFunction
+      Handler: copy_files.lambda_handler
+      Runtime: python3.12
+      Timeout: 100
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: S3Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: S3Bucket
+    Metadata:
+      SamResourceId: CopyXMLFilesFunction
+  CopyXMLFiles:
+    Type: Custom::CopyS3Objects
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+        - CopyXMLFilesFunction
+        - Arn
+      DestBucket:
+        Ref: S3Bucket
+      Timeout: 100
+    DependsOn: S3Bucket
+Outputs:
+  CloudFrontDomainName:
+    Description: Domain name of the CloudFront distribution
+    Value:
+      Fn::GetAtt:
+      - CloudFrontDistribution
+      - DomainName
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Value:
+      Ref: S3Bucket
+  LambdaFunctionName:
+    Description: Name of the Lambda function
+    Value:
+      Ref: UpdateXMLFilesFunction
+  LoggingBucketName:
+    Description: Name of the logging bucket
+    Value:
+      Ref: LoggingBucket

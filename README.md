@@ -46,6 +46,7 @@ To deploy this solution, use the following steps with the AWS SAM (Serverless Ap
    cd feedparser_layer
    chmod +x bash-script.sh
    ./bash-script.sh
+   cd ..
    ```
 2. **Build the SAM Application:**
    ```bash

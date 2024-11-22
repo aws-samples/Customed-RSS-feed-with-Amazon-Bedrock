@@ -15,9 +15,9 @@ mkdir -p python/lib/python3.12/site-packages
 cp -r venv/lib/python3.12/site-packages/* python/lib/python3.12/site-packages/
 
 # Create the zip file
-zip -r ../feedparser_layer.zip python
+zip -r ../feedparser-layer.zip python
 
 # Clean up
 rm -rf python
 
-cd ..
+deactivate
