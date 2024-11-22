@@ -37,9 +37,9 @@ The solution architecture is illustrated below:
 
 To deploy this solution, use the following steps with the AWS SAM (Serverless Application Model):
 
-0. ** prerequisit Python 3.12 and SAM** (optional)**
-   Python 3.12: https://www.python.org/downloads/release/python-3120/
-   AWS Serverless Application Model: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
+0. **prerequisit Python 3.12 and SAM (optional)**
+   ***Python 3.12: https://www.python.org/downloads/release/python-3120/***
+   ***AWS Serverless Application Model: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html***
 
 1. **create feedparser_layer.zip into the main folder which is to be used for AWS Lambda Layer**
    ```bash
