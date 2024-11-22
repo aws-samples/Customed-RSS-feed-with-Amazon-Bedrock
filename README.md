@@ -46,6 +46,7 @@ To deploy this solution, use the following steps with the AWS SAM (Serverless Ap
    mkdir -p python/lib/python3.12/site-packages
    cp -r venv/lib/python3.12/site-packages/* python/lib/python3.12/site-packages/
    zip -r ../feedparser_layer.zip python
+   cd ..
    ```
 2. **Build the SAM Application:**
    ```bash
