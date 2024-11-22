@@ -2,7 +2,7 @@
 
 ## Overview
 
-Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) leverages Amazon Bedrock prompt flow to automate the process of filtering and distributing relevant AWS news to customer technical teams, ensuring only the most pertinent updates reach the right audience.
+Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) leverages Amazon Bedrock flows to automate the process of filtering and distributing relevant AWS news to customer technical teams, ensuring only the most pertinent updates reach the right audience.
 
 ## Solution Architecture
 
@@ -20,7 +20,7 @@ The solution architecture is illustrated below:
 
 1. **RSS Feed Ingestion**: The system retrieves the latest AWS news from the official AWS RSS feed.
 2. **Deduplication and Storage**: Two XML files are maintained in Amazon S3 to track processed and relevant news items.
-3. **Intelligent Filtering**: Amazon Bedrock's prompt flow analyzes news content for relevance.
+3. **Intelligent Filtering**: Amazon Bedrock's flow analyzes news content for relevance.
 4. **Dynamic RSS Feed Generation**: New RSS entries are generated with added context for relevant items.
 5. **Distribution**: Updates are distributed via Amazon CloudFront, with flexibility for integration into additional platforms.
 
@@ -28,7 +28,7 @@ The solution architecture is illustrated below:
 
 ## Key Features
 
-- **Customizable Intelligence**: Leverages Amazon Bedrock’s prompt flow to filter and contextualize AWS news based on customer needs.
+- **Customizable Intelligence**: Leverages Amazon Bedrock’s flows to filter and contextualize AWS news based on customer needs.
 - **Scalable Processing**: Efficiently processes high volumes of news items.
 - **Continuous Learning**: The solution refines its filtering capabilities over time.
 - **Flexible Integration**: Easily integrates with additional AWS services for extended functionality.
@@ -75,6 +75,6 @@ Continuous Improvement: Learns from ongoing data to improve relevance filtering.
 AWS Service Integration: Easily extends to integrate with other AWS services.
 
 ## Conclusion
-Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) demonstrates Amazon Bedrock's prompt flow capability to intelligently filter and distribute relevant AWS news. By ensuring customers receive actionable information, AWSNews empowers technical teams with timely, curated insights.
+Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) demonstrates Amazon Bedrock's flows capability to intelligently filter and distribute relevant AWS news. By ensuring customers receive actionable information, AWSNews empowers technical teams with timely, curated insights.
 
 We welcome feedback and encourage you to share innovative uses of this solution in real-world scenarios.
