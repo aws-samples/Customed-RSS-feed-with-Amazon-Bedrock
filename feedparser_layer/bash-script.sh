@@ -1,5 +1,7 @@
 #!/bin/bash
 
+python3 -m venv venv
+
 # Ensure we're in the virtual environment
 source venv/bin/activate
 
@@ -17,3 +19,5 @@ zip -r ../feedparser_layer.zip python
 
 # Clean up
 rm -rf python
+
+cd ..
