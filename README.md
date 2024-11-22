@@ -1,4 +1,4 @@
-# Customed-RSS-feed-with-Amazon-Bedrock(AWSNews): Intelligent AWS News Distribution with Amazon Bedrock Prompt Flow
+# Customed-RSS-feed-with-Amazon-Bedrock(AWSNews): Intelligent AWS News Distribution with Amazon Bedrock Flows
 
 ## Overview
 
