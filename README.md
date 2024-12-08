@@ -6,7 +6,7 @@ Customed-RSS-feed-with-Amazon-Bedrock(AWSNews) leverages Amazon Bedrock flows to
 
 ## Solution Architecture
 
-The AWSNews solution uses a serverless architecture that combines:
+The AWSNews solution is a Proof of Concept (PoC) that leverages a serverless architecture, integrating the following components:
 - Amazon S3 (for storage)
 - AWS Lambda (for processing)
 - Amazon Bedrock (for intelligent filtering and contextualization)

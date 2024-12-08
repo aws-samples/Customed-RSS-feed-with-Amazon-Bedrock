@@ -38,7 +38,7 @@ Resources:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
 
-
+  # checkov:skip=CKV_AWS_18: "This is a logging bucket, access logging is not required"
   LoggingBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -46,13 +46,13 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
+        BlockPublicAcls: true
         BlockPublicPolicy: true
-        IgnorePublicAcls: false
+        IgnorePublicAcls: true
         RestrictPublicBuckets: true
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerPreferred
+          - ObjectOwnership: BucketOwnerEnforced
       LifecycleConfiguration:
         Rules:
           - Id: DeleteOldLogs
@@ -89,7 +89,10 @@ Resources:
           Bucket: !GetAtt LoggingBucket.RegionalDomainName
           Prefix: cloudfront-logs/
           IncludeCookies: false
-
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+          
   FeedparserLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
