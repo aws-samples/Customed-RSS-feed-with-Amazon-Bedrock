@@ -118,9 +118,13 @@ Resources:
               - Effect: Allow
                 Action:
                   - bedrock:InvokeModel
+                Resource: !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:*'
+              - Effect: Allow
+                Action:
                   - s3:GetObject
                   - s3:PutObject
-                Resource: '*'
+                Resource: !Sub '${S3Bucket.Arn}/*'
+
 
   UpdateXMLFilesFunction:
     Type: AWS::Serverless::Function
@@ -177,7 +181,7 @@ Resources:
                 - bedrock-agent-runtime:ListFlowAliases
                 - bedrock-agent-runtime:GetFlow
                 - bedrock-agent-runtime:GetFlowAlias
-              Resource: '*'
+              Resource: !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:*'
             - Effect: Allow
               Action:
                 - iam:PassRole
