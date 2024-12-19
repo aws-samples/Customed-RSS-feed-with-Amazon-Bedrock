@@ -12,6 +12,8 @@ The AWSNews solution is a Proof of Concept (PoC) that leverages a serverless arc
 - Amazon Bedrock (for intelligent filtering and contextualization)
 - Amazon CloudFront (for content distribution)
 
+A recommandation to move into production environment is to also add AWS WAF to enhance the security.
+
 The solution architecture is illustrated below:
 
 ![Solution Architecture](image/architecture.png)
