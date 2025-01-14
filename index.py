@@ -71,7 +71,7 @@ def create_rss_feed(items):
 
 def create_prompt_flow(client):
     # Replace with the service role that you created.
-    #FLOWS_SERVICE_ROLE = "arn:aws:iam::071385330200:role/service-role/AmazonBedrockExecutionRoleForFlows_VHMQ1JP0E8M"
+    #FLOWS_SERVICE_ROLE = "arn:aws:iam::xxxxxxxxxxxxxxx:role/service-role/AmazonBedrockExecutionRoleForFlows_VHMQ1JP0E8M"
 
     # Define each node
 
@@ -470,7 +470,44 @@ def lambda_handler(event, context):
         # Create a Bedrock client
         client = boto3.client(service_name='bedrock-agent')
 
-        result_flow = create_prompt_flow(client)
+        # Check for existing flows starting with "AWSNews_"
+        flows_response = client.list_flows()
+        flows = flows_response.get('flowSummaries', [])
+        existing_flow = next((flow for flow in flows if flow['name'].startswith('AWSNews_')), None)
+
+        if existing_flow:
+            # Use the existing flow
+            flow_id = existing_flow['id']
+            flow_aliases_response = client.list_flow_aliases(flowIdentifier=flow_id)
+            flow_aliases = flow_aliases_response.get('flowAliasSummaries', [])
+            flow_alias_id = next((alias['id'] for alias in flow_aliases if alias['name'] == 'latest'), None)
+
+            if not flow_alias_id:
+                # Create a new alias if 'latest' doesn't exist
+                response = client.create_flow_alias(
+                    flowIdentifier=flow_id,
+                    name="latest",
+                    description="Alias pointing to the latest version of the flow.",
+                    routingConfiguration=[
+                        {
+                            "flowVersion": client.get_flow(flowIdentifier=flow_id)['latestVersion']
+                        }
+                    ]
+                )
+                flow_alias_id = response.get("id")
+
+            result_flow = {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "flowId": flow_id,
+                    "flow_alias_Id": flow_alias_id,
+                    "message": "Existing flow retrieved successfully"
+                })
+            }
+            print(f"Using existing flow: {existing_flow['name']}")
+        else:
+            # Create a new flow
+            result_flow = create_prompt_flow(client)
 
         print("result_flow: " + str(result_flow))    
 
