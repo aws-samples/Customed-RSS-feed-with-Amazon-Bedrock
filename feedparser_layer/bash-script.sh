@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 -m venv venv
+python -m venv venv
 
 # Ensure we're in the virtual environment
 source venv/bin/activate

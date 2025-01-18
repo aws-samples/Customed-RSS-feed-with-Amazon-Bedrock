@@ -105,7 +105,22 @@ def create_prompt_flow(client):
                         },
                         "templateConfiguration": {
                             "text": {
-                                "text": "Filter below RSS news in XML  '{{AWSNewsScope}}‘ from AWS, check if it contains any of the key words like  ECS, API Gateway, Lambda, VPC Endpoints, S3, Cognito, ALB, WAF, SSM, Bedrock, RDS,  if yes then only categorize it as one of the following: InTheScope OutOfTheScope Do not include any additional text or preamble."
+                                "text": """Task: Analyze the provided AWS RSS news item and categorize it based on specific keywords.
+
+Input: An XML string containing an AWS news item, enclosed in <AWSNewsScope> tags.
+
+Instructions:
+1. Parse the XML content within the <AWSNewsScope> tags.
+2. Search for the following keywords (case-insensitive):
+   ECS, API Gateway, Lambda, VPC Endpoints, S3, Cognito, ALB, WAF, SSM, Bedrock, RDS
+3. Categorization:
+   - If any of the keywords are present: Respond with "InTheScope"
+   - If none of the keywords are present: Respond with "OutOfTheScope"
+4. Provide only the categorization result without any additional text.
+
+<AWSNewsScope>
+{{AWSNewsScope}}
+</AWSNewsScope>"""
                             }
                         }
                     }
@@ -172,7 +187,23 @@ def create_prompt_flow(client):
                         },
                         "templateConfiguration": {
                             "text": {
-                                "text": "Transform below'{{RSSnews}}' into message in french for Teams intended for a large internal project team,  reorganise the below into RSS feed xml only one <item> format, and do not inlcude any additional text or preamble,  there needs to add <guid>, <title>, <link>, and <description> elements into <item>, and <description> within 150 words."
+                                "text": """Task: Transform AWS RSS news into a French Teams message and reformat it as an RSS feed item.
+
+Input: An XML string containing AWS news, enclosed in <RSSnews> tags.
+
+Instructions:
+1. Parse the content within the <RSSnews> tags.
+2. Transform the content into a French message suitable for a large internal project team on Microsoft Teams.
+3. Reformat the content into a single RSS feed <item> with the following elements:
+   <guid>: Generate a unique identifier
+   <title>: Create a concise French title
+   <link>: Include the original news link if available
+   <description>: Summarize the content in French, limited to 150 words
+4. Respond with only the formatted RSS <item> XML, without any additional text.
+
+<RSSnews>
+{{RSSnews}}
+</RSSnews>"""
                             }
                         }
                     }
